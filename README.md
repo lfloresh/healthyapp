@@ -14,3 +14,5 @@ A new Flutter project.
     -Reemplace la carpeta lib por la del repositorio
     -Reemplace el archivo pubspec.yaml
     -Agregue la carpeta assets
+-Ejecute con : flutter run en terminal, o start debugging de VScode.
+-Le pedira un emulador, seleccione el que creó.
