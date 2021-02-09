@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:healthyapp/other/shortcuts.dart';
+import 'package:provider/provider.dart';
+import 'package:testAndroid/Notifiers/currentPage.dart';
+import 'package:testAndroid/widgets/styleText.dart';
 
 class PerfilPage extends StatefulWidget {
   PerfilPage({Key key}) : super(key: key);
-
   @override
   _PerfilPageState createState() => _PerfilPageState();
 }
 
 class _PerfilPageState extends State<PerfilPage> {
-  void _goToPage(int index) {
-    if (index == 0) Navigator.pushReplacementNamed(context, '/Home');
-    if (index == 1) Navigator.pushReplacementNamed(context, '/Alimentos');
-    if (index == 2) Navigator.pushReplacementNamed(context, '/Perfil');
-  }
-
   @override
   Widget build(BuildContext context) {
+    final page = Provider.of<CurrentPage>(context, listen: false);
     return Scaffold(
+      backgroundColor: Colors.green[100],
       body: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
@@ -104,7 +101,11 @@ class _PerfilPageState extends State<PerfilPage> {
           ),
         ],
         currentIndex: 2,
-        onTap: _goToPage,
+        onTap: (int index) {
+          if (index == 0) page.page = "Home";
+          if (index == 1) page.page = "Alimentos";
+          if (index == 2) page.page = "Perfil";
+        },
       ),
     );
   }

@@ -1,35 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:healthyapp/routes/1Login.dart';
-import 'package:healthyapp/routes/2Register.dart';
-import 'package:healthyapp/routes/3Home.dart';
-import 'package:healthyapp/routes/4Registros.dart';
-import 'package:healthyapp/routes/5Progreso.dart';
-import 'package:healthyapp/routes/6Objetivos.dart';
-import 'package:healthyapp/routes/7Graficos.dart';
-import 'package:healthyapp/routes/8Alimentos.dart';
-import 'package:healthyapp/routes/9Perfil.dart';
+import 'package:testAndroid/Notifiers/currentPage.dart';
+import 'package:testAndroid/Notifiers/registerParameters.dart';
+import 'package:testAndroid/models/user.dart';
+import 'package:provider/provider.dart';
+import 'package:testAndroid/screens/wrapper.dart';
+import 'package:testAndroid/services/auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(PruebasApp());
 }
 
-class MyApp extends StatelessWidget {
+class PruebasApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<CurrentPage>(create: (_) => CurrentPage()),
+        StreamProvider<UserModel>.value(value: AuthService().user),
+        ChangeNotifierProvider<RegisterParameters>(
+            create: (_) => RegisterParameters()),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: [GlobalMaterialLocalizations.delegate],
+        supportedLocales: [const Locale('en'), const Locale('es')],
         debugShowCheckedModeBanner: false,
-        title: "Healthy  App",
-        initialRoute: '/',
-        routes: <String, WidgetBuilder>{
-          '/': (BuildContext context) => LoginPage(),
-          '/Register': (BuildContext context) => RegisterPage(),
-          '/Home': (BuildContext context) => HomePage(),
-          '/Registros': (BuildContext context) => RegistrosPage(),
-          '/Progreso': (BuildContext context) => ProgresoPage(),
-          '/Objetivos': (BuildContext context) => ObjetivosPage(),
-          '/Graficos': (BuildContext context) => GraficosPage(),
-          '/Alimentos': (BuildContext context) => AlimentosPage(),
-          '/Perfil': (BuildContext context) => PerfilPage(),
-        });
+        theme: ThemeData(
+            backgroundColor: Colors.green,
+            appBarTheme: AppBarTheme(color: Color(0xff417505))),
+        title: "Pruebas",
+        home: Wrapper(),
+      ),
+    );
   }
 }
