@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:testAndroid/screens/Authenticate/login.dart';
-import 'package:testAndroid/screens/Authenticate/register.dart';
+import 'package:healthyapp/screens/Authenticate/login.dart';
+import 'package:healthyapp/screens/Authenticate/register.dart';
 
 class Authenticate extends StatefulWidget {
   Authenticate({Key key}) : super(key: key);

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/Notifiers/currentPage.dart';
-import 'package:testAndroid/Notifiers/registerParameters.dart';
-import 'package:testAndroid/models/homeData.dart';
+import 'package:healthyapp/Notifiers/currentPage.dart';
+import 'package:healthyapp/Notifiers/registerParameters.dart';
+import 'package:healthyapp/models/homeData.dart';
 import 'package:intl/intl.dart';
-import 'package:testAndroid/models/registerDay.dart';
-import 'package:testAndroid/models/user.dart';
-import 'package:testAndroid/screens/home/8addFood.dart';
-import 'package:testAndroid/services/database.dart';
-import 'package:testAndroid/widgets/listDrawer.dart';
-import 'package:testAndroid/widgets/loading.dart';
-import 'package:testAndroid/widgets/styleText.dart';
+import 'package:healthyapp/models/registerDay.dart';
+import 'package:healthyapp/models/user.dart';
+import 'package:healthyapp/screens/home/8addFood.dart';
+import 'package:healthyapp/services/database.dart';
+import 'package:healthyapp/widgets/listDrawer.dart';
+import 'package:healthyapp/widgets/loading.dart';
+import 'package:healthyapp/widgets/styleText.dart';
 
 class RegistrosPage extends StatefulWidget {
   @override

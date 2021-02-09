@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/Notifiers/currentPage.dart';
-import 'package:testAndroid/Notifiers/registerParameters.dart';
-import 'package:testAndroid/models/alimento.dart';
-import 'package:testAndroid/screens/home/8addFood.dart';
-import 'package:testAndroid/services/database.dart';
-import 'package:testAndroid/widgets/listDrawer.dart';
-import 'package:testAndroid/widgets/styleText.dart';
+import 'package:healthyapp/Notifiers/currentPage.dart';
+import 'package:healthyapp/Notifiers/registerParameters.dart';
+import 'package:healthyapp/models/alimento.dart';
+import 'package:healthyapp/screens/home/8addFood.dart';
+import 'package:healthyapp/services/database.dart';
+import 'package:healthyapp/widgets/listDrawer.dart';
+import 'package:healthyapp/widgets/styleText.dart';
 
 class AlimentosPage extends StatefulWidget {
   AlimentosPage({Key key}) : super(key: key);

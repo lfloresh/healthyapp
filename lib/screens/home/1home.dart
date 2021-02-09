@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/Notifiers/currentPage.dart';
-import 'package:testAndroid/models/homeData.dart';
-import 'package:testAndroid/widgets/listDrawer.dart';
-import 'package:testAndroid/widgets/loading.dart';
-import 'package:testAndroid/widgets/popUpDialog.dart';
-import 'package:testAndroid/widgets/styleText.dart';
+import 'package:healthyapp/Notifiers/currentPage.dart';
+import 'package:healthyapp/models/homeData.dart';
+import 'package:healthyapp/widgets/listDrawer.dart';
+import 'package:healthyapp/widgets/loading.dart';
+import 'package:healthyapp/widgets/popUpDialog.dart';
+import 'package:healthyapp/widgets/styleText.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);

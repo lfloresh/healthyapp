@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/Notifiers/currentPage.dart';
-import 'package:testAndroid/screens/home/1home.dart';
-import 'package:testAndroid/screens/home/2registros.dart';
-import 'package:testAndroid/screens/home/3progreso.dart';
-import 'package:testAndroid/screens/home/4objetivos.dart';
-import 'package:testAndroid/screens/home/5graficos.dart';
-import 'package:testAndroid/screens/home/6alimentos.dart';
-import 'package:testAndroid/screens/home/7perfil.dart';
+import 'package:healthyapp/Notifiers/currentPage.dart';
+import 'package:healthyapp/screens/home/1home.dart';
+import 'package:healthyapp/screens/home/2registros.dart';
+import 'package:healthyapp/screens/home/3progreso.dart';
+import 'package:healthyapp/screens/home/4objetivos.dart';
+import 'package:healthyapp/screens/home/5graficos.dart';
+import 'package:healthyapp/screens/home/6alimentos.dart';
+import 'package:healthyapp/screens/home/7perfil.dart';
 
 class SwitchPage extends StatelessWidget {
   @override

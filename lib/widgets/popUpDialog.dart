@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:testAndroid/widgets/styleText.dart';
+import 'package:healthyapp/widgets/styleText.dart';
 
 Widget buildPopUpDialog(BuildContext context) {
   return AlertDialog(

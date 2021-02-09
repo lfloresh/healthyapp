@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/Notifiers/currentPage.dart';
-import 'package:testAndroid/widgets/styleText.dart';
+import 'package:healthyapp/Notifiers/currentPage.dart';
+import 'package:healthyapp/widgets/styleText.dart';
 
 class PerfilPage extends StatefulWidget {
   PerfilPage({Key key}) : super(key: key);

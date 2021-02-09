@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/Notifiers/currentPage.dart';
-import 'package:testAndroid/models/user.dart';
-import 'package:testAndroid/services/auth.dart';
-import 'package:testAndroid/services/storage.dart';
+import 'package:healthyapp/Notifiers/currentPage.dart';
+import 'package:healthyapp/models/user.dart';
+import 'package:healthyapp/services/auth.dart';
+import 'package:healthyapp/services/storage.dart';
 
 Widget listDrawer(BuildContext context) {
   final page = Provider.of<CurrentPage>(context, listen: false);

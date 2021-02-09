@@ -1,10 +1,10 @@
 import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:testAndroid/Notifiers/registerParameters.dart';
-import 'package:testAndroid/models/alimento.dart';
-import 'package:testAndroid/models/homeData.dart';
-import 'package:testAndroid/models/registerDay.dart';
+import 'package:healthyapp/Notifiers/registerParameters.dart';
+import 'package:healthyapp/models/alimento.dart';
+import 'package:healthyapp/models/homeData.dart';
+import 'package:healthyapp/models/registerDay.dart';
 import 'package:intl/intl.dart';
 
 class DatabaseService {

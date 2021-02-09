@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/models/homeData.dart';
-import 'package:testAndroid/models/user.dart';
-import 'package:testAndroid/screens/Authenticate/authenticate.dart';
-import 'package:testAndroid/screens/switch.dart';
-import 'package:testAndroid/services/database.dart';
+import 'package:healthyapp/models/homeData.dart';
+import 'package:healthyapp/models/user.dart';
+import 'package:healthyapp/screens/Authenticate/authenticate.dart';
+import 'package:healthyapp/screens/switch.dart';
+import 'package:healthyapp/services/database.dart';
 
 class Wrapper extends StatelessWidget {
   @override

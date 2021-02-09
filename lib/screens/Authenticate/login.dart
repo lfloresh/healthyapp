@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:testAndroid/services/auth.dart';
-import 'package:testAndroid/widgets/loading.dart';
+import 'package:healthyapp/services/auth.dart';
+import 'package:healthyapp/widgets/loading.dart';
 
 class LoginPage extends StatefulWidget {
   final Function toggleView;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:testAndroid/Notifiers/currentPage.dart';
-import 'package:testAndroid/Notifiers/registerParameters.dart';
-import 'package:testAndroid/models/user.dart';
+import 'package:healthyapp/Notifiers/currentPage.dart';
+import 'package:healthyapp/Notifiers/registerParameters.dart';
+import 'package:healthyapp/models/user.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/screens/wrapper.dart';
-import 'package:testAndroid/services/auth.dart';
+import 'package:healthyapp/screens/wrapper.dart';
+import 'package:healthyapp/services/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 

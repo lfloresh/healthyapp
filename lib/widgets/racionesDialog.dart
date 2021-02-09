@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/Notifiers/registerParameters.dart';
-import 'package:testAndroid/models/alimento.dart';
-import 'package:testAndroid/widgets/styleText.dart';
+import 'package:healthyapp/Notifiers/registerParameters.dart';
+import 'package:healthyapp/models/alimento.dart';
+import 'package:healthyapp/widgets/styleText.dart';
 import 'package:flutter/services.dart';
 
 class RacionesDialog extends StatefulWidget {

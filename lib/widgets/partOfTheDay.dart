@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testAndroid/Notifiers/registerParameters.dart';
-import 'package:testAndroid/widgets/styleText.dart';
+import 'package:healthyapp/Notifiers/registerParameters.dart';
+import 'package:healthyapp/widgets/styleText.dart';
 
 Widget partOfTheDay(BuildContext context) {
   final option = Provider.of<RegisterParameters>(context);
