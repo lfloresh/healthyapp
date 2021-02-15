@@ -3,23 +3,32 @@ import 'package:provider/provider.dart';
 import 'package:healthyapp/Notifiers/currentPage.dart';
 import 'package:healthyapp/Notifiers/registerParameters.dart';
 import 'package:healthyapp/models/alimento.dart';
+import 'package:healthyapp/screens/home/10createFood.dart';
 import 'package:healthyapp/screens/home/8addFood.dart';
 import 'package:healthyapp/services/database.dart';
 import 'package:healthyapp/widgets/listDrawer.dart';
 import 'package:healthyapp/widgets/styleText.dart';
 
 class AlimentosPage extends StatefulWidget {
-  AlimentosPage({Key key}) : super(key: key);
+  final DatabaseService db;
+  AlimentosPage({Key key, this.db}) : super(key: key);
   @override
-  _AlimentosPageState createState() => _AlimentosPageState();
+  _AlimentosPageState createState() => _AlimentosPageState(this.db);
 }
 
 class _AlimentosPageState extends State<AlimentosPage> {
-  final _db = DatabaseService();
+  _AlimentosPageState(DatabaseService db) {
+    this._db = db;
+  }
+
+  DatabaseService _db;
+
   @override
   Widget build(BuildContext context) {
     final page = Provider.of<CurrentPage>(context, listen: false);
     final option = Provider.of<RegisterParameters>(context, listen: false);
+    //final user = Provider.of<UserModel>(context, listen: false);
+    //print(user.uid);
     return Scaffold(
       backgroundColor: Colors.green[100],
       appBar: AppBar(
@@ -30,9 +39,12 @@ class _AlimentosPageState extends State<AlimentosPage> {
             padding: EdgeInsets.only(right: 10),
             child: GestureDetector(
               onTap: () {
-                print("Crear alimento");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreateFood()),
+                );
               },
-              child: styleText("+", 25),
+              child: styleText("Crear", 20),
             ),
           ),
         ],
@@ -56,6 +68,7 @@ class _AlimentosPageState extends State<AlimentosPage> {
                 ),
                 onChanged: (value) {
                   _db.name = value.toLowerCase().trim();
+                  //print(_db.uid);
                   setState(() {});
                 },
               ),
@@ -68,42 +81,81 @@ class _AlimentosPageState extends State<AlimentosPage> {
             StreamBuilder<List<Alimento>>(
               stream: _db.alimentos,
               builder: (context, snapshot) {
-                if (_db.name == "") return Container();
-                return (snapshot.connectionState == ConnectionState.waiting)
-                    ? Center(
-                        child: CircularProgressIndicator(
-                        backgroundColor: Colors.green,
-                      ))
-                    : ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (context, index) {
-                          var a = snapshot.data[index];
-                          var racion = a.raciones[0];
-                          return Container(
-                            child: ListTile(
-                              title: styleText(a.nombre, 15),
-                              subtitle: styleText(
-                                  "${a.description}, ${racion["tamaño"].toDouble()} ${racion["medida"]} ",
-                                  15),
-                              trailing: styleText("${racion["calorias"]}", 15),
-                              onTap: () {
-                                option.racion = racion;
-                                option.nraciones = 1.0;
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddFood(
-                                      alimento: snapshot.data[index],
-                                    ),
+                return StreamBuilder<List<Alimento>>(
+                  stream: _db.uAlimentos,
+                  builder: (_, snapshot2) {
+                    if (_db.name == "") return Container();
+                    return (snapshot.connectionState ==
+                                ConnectionState.waiting &&
+                            snapshot2.connectionState ==
+                                ConnectionState.waiting)
+                        ? Center(
+                            child: CircularProgressIndicator(
+                            backgroundColor: Colors.green,
+                          ))
+                        : ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount:
+                                snapshot.data.length + snapshot2.data.length,
+                            itemBuilder: (context, index) {
+                              if (index < snapshot2.data.length) {
+                                var a = snapshot2.data[index];
+                                var racion = a.raciones[0];
+                                return Container(
+                                  child: ListTile(
+                                    title: styleText(a.nombre, 15),
+                                    subtitle: styleText(
+                                        "${a.description}, ${racion["tamaño"].toDouble()} ${racion["medida"]} ",
+                                        15),
+                                    trailing:
+                                        styleText("${racion["calorias"]}", 15),
+                                    onTap: () {
+                                      option.racion = racion;
+                                      option.nraciones = 1.0;
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AddFood(
+                                            alimento: snapshot2.data[index],
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
                                 );
-                              },
-                            ),
+                              } else {
+                                var a = snapshot
+                                    .data[index - snapshot2.data.length];
+                                var racion = a.raciones[0];
+                                return Container(
+                                  child: ListTile(
+                                    title: styleText(a.nombre, 15),
+                                    subtitle: styleText(
+                                        "${a.description}, ${racion["tamaño"].toDouble()} ${racion["medida"]} ",
+                                        15),
+                                    trailing:
+                                        styleText("${racion["calorias"]}", 15),
+                                    onTap: () {
+                                      option.racion = racion;
+                                      option.nraciones = 1.0;
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AddFood(
+                                            alimento: snapshot.data[
+                                                index - snapshot2.data.length],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                              }
+                            },
                           );
-                        },
-                      );
+                  },
+                );
               },
             ),
           ],

@@ -13,41 +13,49 @@ Widget partOfTheDay(BuildContext context) {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        FlatButton(
-          minWidth: 100,
-          color: Colors.green[200],
-          child: styleText("Desayuno", 15),
-          onPressed: () {
-            option.option = "Desayuno";
-            Navigator.pop(context);
-          },
+        Container(
+          width: 140,
+          child: FlatButton(
+            color: Colors.green[200],
+            child: styleText("Desayuno", 15),
+            onPressed: () {
+              option.option = "Desayuno";
+              Navigator.pop(context);
+            },
+          ),
         ),
-        FlatButton(
-          minWidth: 100,
-          color: Colors.green[200],
-          child: styleText("Almuerzo", 15),
-          onPressed: () {
-            option.option = "Almuerzo";
-            Navigator.pop(context);
-          },
+        Container(
+          width: 140,
+          child: FlatButton(
+            color: Colors.green[200],
+            child: styleText("Almuerzo", 15),
+            onPressed: () {
+              option.option = "Almuerzo";
+              Navigator.pop(context);
+            },
+          ),
         ),
-        FlatButton(
-          minWidth: 100,
-          color: Colors.green[200],
-          child: styleText("Cena", 15),
-          onPressed: () {
-            option.option = "Cena";
-            Navigator.pop(context);
-          },
+        Container(
+          width: 140,
+          child: FlatButton(
+            color: Colors.green[200],
+            child: styleText("Cena", 15),
+            onPressed: () {
+              option.option = "Cena";
+              Navigator.pop(context);
+            },
+          ),
         ),
-        FlatButton(
-          minWidth: 100,
-          color: Colors.green[200],
-          child: styleText("Meriendas", 15),
-          onPressed: () {
-            option.option = "Meriendas";
-            Navigator.pop(context);
-          },
+        Container(
+          width: 140,
+          child: FlatButton(
+            color: Colors.green[200],
+            child: styleText("Meriendas", 15),
+            onPressed: () {
+              option.option = "Meriendas";
+              Navigator.pop(context);
+            },
+          ),
         ),
       ],
     ),

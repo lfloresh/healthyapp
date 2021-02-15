@@ -6,21 +6,19 @@ import 'package:healthyapp/models/alimento.dart';
 import 'package:healthyapp/models/macros.dart';
 import 'package:healthyapp/models/user.dart';
 import 'package:healthyapp/services/database.dart';
-import 'package:healthyapp/widgets/partOfTheDay.dart';
 import 'package:healthyapp/widgets/racionesDialog.dart';
 import 'package:healthyapp/widgets/styleText.dart';
-import 'package:intl/intl.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-class AddFood extends StatefulWidget {
+class UpdateFood extends StatefulWidget {
   final Alimento alimento;
-  AddFood({Key key, this.alimento}) : super(key: key);
+  UpdateFood({Key key, this.alimento}) : super(key: key);
 
   @override
-  _AddFoodState createState() => _AddFoodState();
+  _UpdateFoodState createState() => _UpdateFoodState();
 }
 
-class _AddFoodState extends State<AddFood> {
+class _UpdateFoodState extends State<UpdateFood> {
   List<charts.Series<Macro, String>> _seriesPieData;
 
   @override
@@ -55,7 +53,6 @@ class _AddFoodState extends State<AddFood> {
             charts.ColorUtil.fromDartColor(macro.color),
         id: '%Macros',
         data: pieData,
-        //labelAccessorFn: (Macro row, _) => '${row.value}',
       ),
     );
     return Scaffold(
@@ -64,104 +61,6 @@ class _AddFoodState extends State<AddFood> {
         title: Consumer<RegisterParameters>(
             builder: (_, opt, widget) =>
                 (Text("Añadir alimento (${opt.option})"))),
-        actions: [
-          Container(
-            margin: EdgeInsets.only(right: 10),
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              onTap: () => showDialog(
-                context: context,
-                builder: (context) => partOfTheDay(context),
-              ),
-              child: styleText("Hora", 15),
-            ),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(51.0),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Colors.grey[300]),
-              ),
-              color: Colors.white,
-            ),
-            height: 50,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  height: 50,
-                  width: 50,
-                  child: FlatButton(
-                    onPressed: () {
-                      option.date = DateTime(option.date.year,
-                          option.date.month, option.date.day - 1);
-                    },
-                    child: Icon(
-                      Icons.arrow_left,
-                      size: 35,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 50,
-                  width: MediaQuery.of(context).size.width / 2,
-                  child: FlatButton(
-                    onPressed: () {
-                      showDatePicker(
-                        context: context,
-                        locale: const Locale("es", "ES"),
-                        currentDate: DateTime.now(),
-                        initialDate: option.date,
-                        firstDate: DateTime(2010),
-                        lastDate: DateTime(2100),
-                        builder: (context, child) {
-                          return Theme(
-                            data: ThemeData.dark().copyWith(
-                              colorScheme: ColorScheme.dark(
-                                primary: Color(0xff417505),
-                                onPrimary: Colors.white,
-                                surface: Color(0xff417505),
-                                onSurface: Colors.white,
-                              ),
-                              dialogBackgroundColor: Colors.green,
-                            ),
-                            child: child,
-                          );
-                        },
-                      ).then((date) {
-                        if (date != null) option.date = date;
-                      });
-                    },
-                    child: Consumer<RegisterParameters>(
-                      builder: (_, date, widget) => DateFormat("dd-MM-yyyy")
-                                  .format(DateTime.now()) ==
-                              DateFormat("dd-MM-yyyy").format(date.date)
-                          ? styleText("Hoy", 20)
-                          : styleText(
-                              DateFormat.yMMMd("es_PE").format(date.date), 20),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 50,
-                  width: 50,
-                  child: FlatButton(
-                    onPressed: () {
-                      option.date = DateTime(option.date.year,
-                          option.date.month, option.date.day + 1);
-                    },
-                    child: Icon(
-                      Icons.arrow_right,
-                      size: 35,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
       body: ListView(
         padding: EdgeInsets.zero,
@@ -357,15 +256,14 @@ class _AddFoodState extends State<AddFood> {
           ),
           Align(
             child: Container(
-              width: 100,
               child: FlatButton(
                 color: Color(0xff417505),
                 child: Text(
-                  "Añadir",
+                  "Actualizar",
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
                 onPressed: () async {
-                  await db.registerAlimento(option, widget.alimento);
+                  await db.updateAlimento(option, widget.alimento);
                   Navigator.pop(context);
                   page.page = "Registros";
                 },

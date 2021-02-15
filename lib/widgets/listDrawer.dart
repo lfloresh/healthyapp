@@ -1,56 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:healthyapp/Notifiers/currentPage.dart';
-import 'package:healthyapp/models/user.dart';
+import 'package:healthyapp/models/userData.dart';
 import 'package:healthyapp/services/auth.dart';
-import 'package:healthyapp/services/storage.dart';
 
 Widget listDrawer(BuildContext context) {
   final page = Provider.of<CurrentPage>(context, listen: false);
-  final user = Provider.of<UserModel>(context);
   final AuthService _auth = AuthService();
-  final StorageService _storage = StorageService(uid: user.uid);
   return Container(
     child: Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Column(
-              children: [
-                Container(
-                  child: ClipRRect(
+            child: Consumer<UserData>(
+              builder: (_, udata, wid) => Column(
+                children: [
+                  ClipRRect(
                     borderRadius: BorderRadius.circular(50.0),
-                    child: FutureBuilder(
-                      future: _storage.getProfileImage(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Image.network(
-                            snapshot.data,
+                    child: (udata.profileURL == "assets/images/perfil.jpg")
+                        ? Image.asset(
+                            udata.profileURL,
                             width: 100,
                             height: 100,
                             fit: BoxFit.fill,
-                          );
-                        } else {
-                          return Image.asset(
-                            "assets/images/perfil.jpg",
+                          )
+                        : Image.network(
+                            udata.profileURL,
                             width: 100,
                             height: 100,
                             fit: BoxFit.fill,
-                          );
-                        }
-                      },
+                          ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      udata.username,
+                      style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Text(
-                    "Luis Angel",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-              ],
+                  )
+                ],
+              ),
             ),
             decoration: BoxDecoration(
               color: Color(0xff417505),
@@ -117,6 +107,7 @@ Widget listDrawer(BuildContext context) {
             title: Text('Cerrar Sesión', style: TextStyle(fontSize: 20)),
             onTap: () async {
               await _auth.signOut();
+              page.page = "Home";
             },
           ),
         ],

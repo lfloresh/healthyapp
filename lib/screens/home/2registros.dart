@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:healthyapp/Notifiers/currentPage.dart';
 import 'package:healthyapp/Notifiers/registerParameters.dart';
-import 'package:healthyapp/models/homeData.dart';
 import 'package:intl/intl.dart';
+import 'package:healthyapp/models/objetivos.dart';
 import 'package:healthyapp/models/registerDay.dart';
 import 'package:healthyapp/models/user.dart';
-import 'package:healthyapp/screens/home/8addFood.dart';
+import 'package:healthyapp/screens/home/11addTraining.dart';
+import 'package:healthyapp/screens/home/12updateTraining.dart';
+import 'package:healthyapp/screens/home/9updateFood.dart';
 import 'package:healthyapp/services/database.dart';
+import 'package:healthyapp/widgets/deleteDialog.dart';
+import 'package:healthyapp/widgets/deleteTraining.dart';
 import 'package:healthyapp/widgets/listDrawer.dart';
 import 'package:healthyapp/widgets/loading.dart';
 import 'package:healthyapp/widgets/styleText.dart';
@@ -121,9 +125,27 @@ class _RegistrosPageState extends State<RegistrosPage> {
                     ],
                   ),
                 ),
-                Consumer<HomeData>(
-                  builder: (context, homeData, _) {
-                    return Container(
+                Consumer<RegisterParameters>(builder: (_, opti, wid) {
+                  db.dia = DateFormat("dd-MM-yyyy").format(opti.date);
+                  return StreamProvider<RegisterDay>.value(
+                    value: db.registerDay,
+                    initialData: RegisterDay(
+                        almuerzo: [],
+                        calorias: 0,
+                        cena: [],
+                        desayuno: [],
+                        meriendas: [],
+                        calEjercicio: 0,
+                        ejercicio: []),
+                    catchError: (_, __) => RegisterDay(
+                        almuerzo: [],
+                        calorias: 0,
+                        cena: [],
+                        desayuno: [],
+                        meriendas: [],
+                        calEjercicio: 0,
+                        ejercicio: []),
+                    child: Container(
                       height: 100,
                       color: Colors.white,
                       child: Column(
@@ -136,7 +158,10 @@ class _RegistrosPageState extends State<RegistrosPage> {
                             children: [
                               Column(
                                 children: [
-                                  styleText(homeData.calObjetivo, 20),
+                                  Consumer<Objetivos>(
+                                      builder: (_, obj, __) => styleText(
+                                          obj.calDiarias.toStringAsFixed(2),
+                                          18)),
                                   Divider(),
                                   styleText("Objetivo", 15)
                                 ],
@@ -150,7 +175,13 @@ class _RegistrosPageState extends State<RegistrosPage> {
                               ),
                               Column(
                                 children: [
-                                  styleText(homeData.calAlimento, 20),
+                                  Consumer<RegisterDay>(builder: (_, day, wid) {
+                                    return styleText(
+                                        day.calorias != 0
+                                            ? day.calorias.toStringAsFixed(2)
+                                            : "0.00",
+                                        18);
+                                  }),
                                   Divider(),
                                   styleText("Alimento", 15)
                                 ],
@@ -164,7 +195,14 @@ class _RegistrosPageState extends State<RegistrosPage> {
                               ),
                               Column(
                                 children: [
-                                  styleText(homeData.calEjercicio, 20),
+                                  Consumer<RegisterDay>(builder: (_, day, wid) {
+                                    return styleText(
+                                        day.calEjercicio != 0
+                                            ? day.calEjercicio
+                                                .toStringAsFixed(2)
+                                            : "0.00",
+                                        18);
+                                  }),
                                   Divider(),
                                   styleText("Ejercicio", 15)
                                 ],
@@ -178,7 +216,17 @@ class _RegistrosPageState extends State<RegistrosPage> {
                               ),
                               Column(
                                 children: [
-                                  styleText(homeData.calRestante, 20),
+                                  Consumer<Objetivos>(
+                                      builder: (_, obj, __) =>
+                                          Consumer<RegisterDay>(
+                                            builder: (context, day, wid) =>
+                                                styleText(
+                                                    (obj.calDiarias -
+                                                            day.calorias +
+                                                            day.calEjercicio)
+                                                        .toStringAsFixed(2),
+                                                    18),
+                                          )),
                                   Divider(),
                                   styleText("Restante", 15)
                                 ],
@@ -187,379 +235,489 @@ class _RegistrosPageState extends State<RegistrosPage> {
                           ),
                         ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                }),
               ],
             ),
             preferredSize: Size.fromHeight(151.0),
           ),
         ),
-        body: Consumer<RegisterParameters>(
-          builder: (_, opt, wid) => FutureBuilder<RegisterDay>(
-              future: db.registerDay(DateFormat("dd-MM-yyyy").format(opt.date)),
-              builder: (_, snapshot) {
-                var day = snapshot.data;
-                return (snapshot.connectionState == ConnectionState.waiting)
-                    ? Loading()
-                    : SingleChildScrollView(
+        body: Consumer<RegisterParameters>(builder: (_, opt, wid) {
+          db.dia = DateFormat("dd-MM-yyyy").format(opt.date);
+          return StreamBuilder<RegisterDay>(
+            stream: db.registerDay,
+            builder: (_, snapshot) {
+              var day = snapshot.data;
+              if (day == null)
+                day = RegisterDay(
+                  desayuno: [],
+                  almuerzo: [],
+                  cena: [],
+                  meriendas: [],
+                  calorias: 0,
+                  calEjercicio: 0,
+                  ejercicio: [],
+                );
+              if (snapshot.connectionState == ConnectionState.waiting)
+                return Loading();
+              if (day != null)
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Card(
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        elevation: 10,
                         child: Column(
                           children: [
-                            Card(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              elevation: 10,
-                              child: Column(
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        styleText("Desayuno", 20),
-                                        styleText("0", 20)
-                                      ],
-                                    ),
-                                  ),
-                                  ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: day.desayuno != null
-                                        ? day.desayuno.length
-                                        : 0,
-                                    itemBuilder: (context, index) => Container(
-                                      decoration: BoxDecoration(
-                                        border:
-                                            Border(top: BorderSide(width: 0.3)),
-                                        color: Colors.white,
-                                      ),
-                                      child: FlatButton(
-                                        child: ListTile(
-                                          trailing: Text(
-                                            (day.desayuno[index]["raciones"] *
-                                                    day.desayuno[index]
-                                                        ["racion"]["calorias"])
-                                                .toStringAsFixed(2),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 18),
-                                          ),
-                                          title: Text(
-                                              day.desayuno[index]["nombre"]),
-                                          subtitle: Text(
-                                              "${day.desayuno[index]["descripción"]}, ${day.desayuno[index]["raciones"] * day.desayuno[index]["racion"]["tamaño"]} ${day.desayuno[index]["racion"]["medida"]}"),
-                                        ),
-                                        onPressed: () async {
-                                          var alimento = await db.alimento(
-                                              day.desayuno[index]["alimento"]);
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                              return AddFood(
-                                                alimento: alimento,
-                                              );
-                                            }),
-                                          );
-                                          opt.nraciones = day.desayuno[index]
-                                                  ["raciones"]
-                                              .toDouble();
-                                          opt.racion =
-                                              day.desayuno[index]["racion"];
-                                          opt.option = "Desayuno";
-                                          opt.index = index;
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  ListTile(
-                                    tileColor: Colors.grey[350],
-                                    leading: Text("+"),
-                                    title: styleText("Añadir alimento", 15),
-                                    onTap: () {
-                                      option.option = "Desayuno";
-                                      page.page = "Alimentos";
-                                    },
-                                  ),
+                                  styleText("Desayuno", 20),
+                                  styleText(
+                                      (day.desayuno == null)
+                                          ? "0.00"
+                                          : day.desayuno
+                                              .fold(0,
+                                                  (a, b) => a + b["calorias"])
+                                              .toStringAsFixed(2),
+                                      20)
                                 ],
                               ),
                             ),
-                            Card(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              elevation: 10,
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        styleText("Almuerzo", 20),
-                                        styleText("0", 20)
-                                      ],
+                            ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: day.desayuno != null
+                                  ? day.desayuno.length
+                                  : 0,
+                              itemBuilder: (context, index) => Container(
+                                decoration: BoxDecoration(
+                                  border: Border(top: BorderSide(width: 0.3)),
+                                  color: Colors.white,
+                                ),
+                                child: FlatButton(
+                                  child: ListTile(
+                                    trailing: Text(
+                                      (day.desayuno[index]["raciones"] *
+                                              day.desayuno[index]["racion"]
+                                                  ["calorias"])
+                                          .toStringAsFixed(2),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 18),
                                     ),
+                                    title: Text(day.desayuno[index]["nombre"]),
+                                    subtitle: Text(
+                                        "${day.desayuno[index]["descripción"]}, ${day.desayuno[index]["raciones"] * day.desayuno[index]["racion"]["tamaño"]} ${day.desayuno[index]["racion"]["medida"]}"),
                                   ),
-                                  ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: day.almuerzo != null
-                                        ? day.almuerzo.length
-                                        : 0,
-                                    itemBuilder: (context, index) => Container(
-                                      decoration: BoxDecoration(
-                                        border:
-                                            Border(top: BorderSide(width: 0.3)),
-                                        color: Colors.white,
-                                      ),
-                                      child: FlatButton(
-                                        child: ListTile(
-                                          trailing: Text(
-                                            (day.almuerzo[index]["raciones"] *
-                                                    day.almuerzo[index]
-                                                        ["racion"]["calorias"])
-                                                .toStringAsFixed(2),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 18),
-                                          ),
-                                          title: Text(
-                                              day.almuerzo[index]["nombre"]),
-                                          subtitle: Text(
-                                              "${day.almuerzo[index]["descripción"]}, ${day.almuerzo[index]["raciones"] * day.almuerzo[index]["racion"]["tamaño"]} ${day.almuerzo[index]["racion"]["medida"]}"),
-                                        ),
-                                        onPressed: () async {
-                                          var alimento = await db.alimento(
-                                              day.almuerzo[index]["alimento"]);
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                              return AddFood(
-                                                alimento: alimento,
-                                              );
-                                            }),
-                                          );
-                                          opt.nraciones = day.almuerzo[index]
-                                                  ["raciones"]
-                                              .toDouble();
-                                          opt.racion =
-                                              day.almuerzo[index]["racion"];
-                                          opt.option = "Almuerzo";
-                                          opt.index = index;
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  ListTile(
-                                    tileColor: Colors.grey[350],
-                                    leading: Text("+"),
-                                    title: styleText("Añadir alimento", 15),
-                                    onTap: () {
-                                      option.option = "Almuerzo";
-                                      page.page = "Alimentos";
-                                    },
-                                  ),
-                                ],
+                                  onPressed: () async {
+                                    print("Hola");
+                                    var alimento =
+                                        await db.alimento(day.desayuno[index]);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) {
+                                        return UpdateFood(
+                                          alimento: alimento,
+                                        );
+                                      }),
+                                    );
+                                    opt.nraciones = day.desayuno[index]
+                                            ["raciones"]
+                                        .toDouble();
+                                    opt.racion = day.desayuno[index]["racion"];
+                                    opt.option = "Desayuno";
+                                    opt.index = index;
+                                  },
+                                  onLongPress: () {
+                                    opt.option = "Desayuno";
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            DeleteDialog(index: index));
+                                  },
+                                ),
                               ),
                             ),
-                            Card(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              elevation: 10,
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        styleText("Cena", 20),
-                                        styleText("0", 20)
-                                      ],
-                                    ),
-                                  ),
-                                  ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount:
-                                        day.cena != null ? day.cena.length : 0,
-                                    itemBuilder: (context, index) => Container(
-                                      decoration: BoxDecoration(
-                                        border:
-                                            Border(top: BorderSide(width: 0.3)),
-                                        color: Colors.white,
-                                      ),
-                                      child: FlatButton(
-                                        child: ListTile(
-                                          trailing: Text(
-                                            (day.cena[index]["raciones"] *
-                                                    day.cena[index]["racion"]
-                                                        ["calorias"])
-                                                .toStringAsFixed(2),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 18),
-                                          ),
-                                          title:
-                                              Text(day.cena[index]["nombre"]),
-                                          subtitle: Text(
-                                              "${day.cena[index]["descripción"]}, ${day.cena[index]["raciones"] * day.cena[index]["racion"]["tamaño"]} ${day.cena[index]["racion"]["medida"]}"),
-                                        ),
-                                        onPressed: () async {
-                                          var alimento = await db.alimento(
-                                              day.cena[index]["alimento"]);
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                              return AddFood(
-                                                alimento: alimento,
-                                              );
-                                            }),
-                                          );
-                                          opt.nraciones = day.cena[index]
-                                                  ["raciones"]
-                                              .toDouble();
-                                          opt.racion =
-                                              day.cena[index]["racion"];
-                                          opt.option = "Cena";
-                                          opt.index = index;
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  ListTile(
-                                    tileColor: Colors.grey[350],
-                                    leading: Text("+"),
-                                    title: styleText("Añadir alimento", 15),
-                                    onTap: () {
-                                      option.option = "Cena";
-                                      page.page = "Alimentos";
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Card(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              elevation: 10,
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        styleText("Meriendas", 20),
-                                        styleText("0", 20)
-                                      ],
-                                    ),
-                                  ),
-                                  ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: day.meriendas != null
-                                        ? day.meriendas.length
-                                        : 0,
-                                    itemBuilder: (context, index) => Container(
-                                      decoration: BoxDecoration(
-                                        border:
-                                            Border(top: BorderSide(width: 0.3)),
-                                        color: Colors.white,
-                                      ),
-                                      child: FlatButton(
-                                        child: ListTile(
-                                          trailing: Text(
-                                            (day.meriendas[index]["raciones"] *
-                                                    day.meriendas[index]
-                                                        ["racion"]["calorias"])
-                                                .toStringAsFixed(2),
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 18),
-                                          ),
-                                          title: Text(
-                                              day.meriendas[index]["nombre"]),
-                                          subtitle: Text(
-                                              "${day.meriendas[index]["descripción"]}, ${day.meriendas[index]["raciones"] * day.meriendas[index]["racion"]["tamaño"]} ${day.meriendas[index]["racion"]["medida"]}"),
-                                        ),
-                                        onPressed: () async {
-                                          var alimento = await db.alimento(
-                                              day.meriendas[index]["alimento"]);
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                              return AddFood(
-                                                alimento: alimento,
-                                              );
-                                            }),
-                                          );
-                                          opt.nraciones = day.meriendas[index]
-                                                  ["raciones"]
-                                              .toDouble();
-                                          opt.racion =
-                                              day.meriendas[index]["racion"];
-                                          opt.option = "Meriendas";
-                                          opt.index = index;
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  ListTile(
-                                    tileColor: Colors.grey[350],
-                                    leading: Text("+"),
-                                    title: styleText("Añadir alimento", 15),
-                                    onTap: () {
-                                      option.option = "Meriendas";
-                                      page.page = "Alimentos";
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Card(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              elevation: 10,
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        styleText("Ejercicio", 20),
-                                        styleText("0", 20)
-                                      ],
-                                    ),
-                                  ),
-                                  ListTile(
-                                    tileColor: Colors.grey[350],
-                                    leading: Text("+"),
-                                    title: styleText("Añadir ejercicio", 15),
-                                    onTap: () {},
-                                  ),
-                                ],
-                              ),
+                            ListTile(
+                              tileColor: Colors.grey[350],
+                              leading: Text("+"),
+                              title: styleText("Añadir alimento", 15),
+                              onTap: () {
+                                option.option = "Desayuno";
+                                page.page = "Alimentos";
+                              },
                             ),
                           ],
                         ),
-                      );
-              }),
-        ),
+                      ),
+                      Card(
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        elevation: 10,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  styleText("Almuerzo", 20),
+                                  styleText(
+                                      (day.almuerzo == null)
+                                          ? "0.00"
+                                          : day.almuerzo
+                                              .fold(0,
+                                                  (a, b) => a + b["calorias"])
+                                              .toStringAsFixed(2),
+                                      20)
+                                ],
+                              ),
+                            ),
+                            ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: day.almuerzo != null
+                                  ? day.almuerzo.length
+                                  : 0,
+                              itemBuilder: (context, index) => Container(
+                                decoration: BoxDecoration(
+                                  border: Border(top: BorderSide(width: 0.3)),
+                                  color: Colors.white,
+                                ),
+                                child: FlatButton(
+                                  child: ListTile(
+                                    trailing: Text(
+                                      (day.almuerzo[index]["raciones"] *
+                                              day.almuerzo[index]["racion"]
+                                                  ["calorias"])
+                                          .toStringAsFixed(2),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 18),
+                                    ),
+                                    title: Text(day.almuerzo[index]["nombre"]),
+                                    subtitle: Text(
+                                        "${day.almuerzo[index]["descripción"]}, ${day.almuerzo[index]["raciones"] * day.almuerzo[index]["racion"]["tamaño"]} ${day.almuerzo[index]["racion"]["medida"]}"),
+                                  ),
+                                  onPressed: () async {
+                                    var alimento =
+                                        await db.alimento(day.almuerzo[index]);
+                                    print(alimento);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) {
+                                        return UpdateFood(
+                                          alimento: alimento,
+                                        );
+                                      }),
+                                    );
+                                    opt.nraciones = day.almuerzo[index]
+                                            ["raciones"]
+                                        .toDouble();
+                                    opt.racion = day.almuerzo[index]["racion"];
+                                    opt.option = "Almuerzo";
+                                    opt.index = index;
+                                  },
+                                  onLongPress: () {
+                                    opt.option = "Almuerzo";
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            DeleteDialog(index: index));
+                                  },
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              tileColor: Colors.grey[350],
+                              leading: Text("+"),
+                              title: styleText("Añadir alimento", 15),
+                              onTap: () {
+                                option.option = "Almuerzo";
+                                page.page = "Alimentos";
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Card(
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        elevation: 10,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  styleText("Cena", 20),
+                                  styleText(
+                                      (day.cena == null)
+                                          ? "0.00"
+                                          : day.cena
+                                              .fold(0,
+                                                  (a, b) => a + b["calorias"])
+                                              .toStringAsFixed(2),
+                                      20)
+                                ],
+                              ),
+                            ),
+                            ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: day.cena != null ? day.cena.length : 0,
+                              itemBuilder: (context, index) => Container(
+                                decoration: BoxDecoration(
+                                  border: Border(top: BorderSide(width: 0.3)),
+                                  color: Colors.white,
+                                ),
+                                child: FlatButton(
+                                  child: ListTile(
+                                    trailing: Text(
+                                      (day.cena[index]["raciones"] *
+                                              day.cena[index]["racion"]
+                                                  ["calorias"])
+                                          .toStringAsFixed(2),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 18),
+                                    ),
+                                    title: Text(day.cena[index]["nombre"]),
+                                    subtitle: Text(
+                                        "${day.cena[index]["descripción"]}, ${day.cena[index]["raciones"] * day.cena[index]["racion"]["tamaño"]} ${day.cena[index]["racion"]["medida"]}"),
+                                  ),
+                                  onPressed: () async {
+                                    var alimento =
+                                        await db.alimento(day.cena[index]);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) {
+                                        return UpdateFood(
+                                          alimento: alimento,
+                                        );
+                                      }),
+                                    );
+                                    opt.nraciones =
+                                        day.cena[index]["raciones"].toDouble();
+                                    opt.racion = day.cena[index]["racion"];
+                                    opt.option = "Cena";
+                                    opt.index = index;
+                                  },
+                                  onLongPress: () {
+                                    opt.option = "Cena";
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            DeleteDialog(index: index));
+                                  },
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              tileColor: Colors.grey[350],
+                              leading: Text("+"),
+                              title: styleText("Añadir alimento", 15),
+                              onTap: () {
+                                option.option = "Cena";
+                                page.page = "Alimentos";
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Card(
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        elevation: 10,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  styleText("Meriendas", 20),
+                                  styleText(
+                                      (day.meriendas == null)
+                                          ? "0.00"
+                                          : day.meriendas
+                                              .fold(0,
+                                                  (a, b) => a + b["calorias"])
+                                              .toStringAsFixed(2),
+                                      20)
+                                ],
+                              ),
+                            ),
+                            ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: day.meriendas != null
+                                  ? day.meriendas.length
+                                  : 0,
+                              itemBuilder: (context, index) => Container(
+                                decoration: BoxDecoration(
+                                  border: Border(top: BorderSide(width: 0.3)),
+                                  color: Colors.white,
+                                ),
+                                child: FlatButton(
+                                  child: ListTile(
+                                    trailing: Text(
+                                      (day.meriendas[index]["raciones"] *
+                                              day.meriendas[index]["racion"]
+                                                  ["calorias"])
+                                          .toStringAsFixed(2),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 18),
+                                    ),
+                                    title: Text(day.meriendas[index]["nombre"]),
+                                    subtitle: Text(
+                                        "${day.meriendas[index]["descripción"]}, ${day.meriendas[index]["raciones"] * day.meriendas[index]["racion"]["tamaño"]} ${day.meriendas[index]["racion"]["medida"]}"),
+                                  ),
+                                  onPressed: () async {
+                                    var alimento =
+                                        await db.alimento(day.meriendas[index]);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) {
+                                        return UpdateFood(
+                                          alimento: alimento,
+                                        );
+                                      }),
+                                    );
+                                    opt.nraciones = day.meriendas[index]
+                                            ["raciones"]
+                                        .toDouble();
+                                    opt.racion = day.meriendas[index]["racion"];
+                                    opt.option = "Meriendas";
+                                    opt.index = index;
+                                  },
+                                  onLongPress: () {
+                                    opt.option = "Meriendas";
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            DeleteDialog(index: index));
+                                  },
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              tileColor: Colors.grey[350],
+                              leading: Text("+"),
+                              title: styleText("Añadir alimento", 15),
+                              onTap: () {
+                                option.option = "Meriendas";
+                                page.page = "Alimentos";
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Card(
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                        elevation: 10,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  styleText("Ejercicio", 20),
+                                  styleText(
+                                      day.calEjercicio.toStringAsFixed(2), 20)
+                                ],
+                              ),
+                            ),
+                            ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: day.ejercicio != null
+                                  ? day.ejercicio.length
+                                  : 0,
+                              itemBuilder: (context, index) => Container(
+                                decoration: BoxDecoration(
+                                  border: Border(top: BorderSide(width: 0.3)),
+                                  color: Colors.white,
+                                ),
+                                child: FlatButton(
+                                  child: ListTile(
+                                    trailing: Text(
+                                      day.ejercicio[index]["calorias"]
+                                          .toStringAsFixed(2),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 18),
+                                    ),
+                                    title: Text(day.ejercicio[index]["nombre"]),
+                                    subtitle: Text(
+                                        "${day.ejercicio[index]["descripción"]}"),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) {
+                                        return UpdateTraining(
+                                          ejercicio: day.ejercicio[index],
+                                        );
+                                      }),
+                                    );
+                                    opt.index = index;
+                                  },
+                                  onLongPress: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) =>
+                                            DeleteTraining(index: index));
+                                  },
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              tileColor: Colors.grey[350],
+                              leading: Text("+"),
+                              title: styleText("Añadir ejercicio", 15),
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddTraining()));
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              else
+                return Loading();
+            },
+          );
+        }),
       ),
     );
   }

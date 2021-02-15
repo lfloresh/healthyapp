@@ -23,23 +23,19 @@ class StorageService {
           //Upload to Firebase
           var snapshot =
               await _storage.ref().child('$uid/profileImage').putFile(file);
-          return snapshot;
+          return snapshot.ref.getDownloadURL();
         }
       }
     } catch (error) {
       print(error.toString());
-      return null;
     }
   }
 
-  Future getProfileImage() async {
-    try {
-      return await _storage
-          .ref()
-          .child('$uid/profileImage.jpg')
-          .getDownloadURL();
-    } catch (error) {
-      return null;
-    }
+  Stream<String> get profileImage {
+    return _storage
+        .ref()
+        .child('$uid/profileImage')
+        .getDownloadURL()
+        .asStream();
   }
 }
