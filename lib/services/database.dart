@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:healthyapp/Notifiers/registerParameters.dart';
 import 'package:healthyapp/models/alimento.dart';
+import 'package:healthyapp/models/entrada.dart';
 import 'package:healthyapp/models/objetivos.dart';
 import 'package:healthyapp/models/registerDay.dart';
 import 'package:intl/intl.dart';
@@ -75,6 +76,17 @@ class DatabaseService {
         : null;
   }
 
+  List<Entrada> _entradasFromFirebase(QuerySnapshot snapshots) {
+    return snapshots != null
+        ? snapshots.docs
+            .map((entrada) => Entrada(
+                  fecha: entrada.data()["fecha"],
+                  peso: entrada.data()["peso"].toDouble(),
+                ))
+            .toList()
+        : null;
+  }
+
   Objetivos _objetivosFromFirebase(DocumentSnapshot doc) {
     return doc != null
         ? Objetivos(
@@ -84,7 +96,9 @@ class DatabaseService {
             calDiarias: doc.data()["calDiarias"].toDouble(),
             carDiarias: doc.data()["carDiarias"].toDouble(),
             proDiarias: doc.data()["proDiarias"].toDouble(),
-            graDiarias: doc.data()["graDiarias"].toDouble())
+            graDiarias: doc.data()["graDiarias"].toDouble(),
+            date: doc.data()["date"],
+            menorFecha: doc.data()["menorFecha"])
         : null;
   }
 
@@ -444,6 +458,61 @@ class DatabaseService {
   Future setObjectives(Map objetivos) async {
     try {
       await _db.collection("objetivos").doc(uid).set(HashMap.from(objetivos));
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future setEntrada(Map entrada) async {
+    try {
+      await _db
+          .collection("objetivos")
+          .doc(uid)
+          .collection("entradas")
+          .doc(entrada["fecha"])
+          .set(HashMap.from(entrada));
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  Future<List<Entrada>> allEntradas() async {
+    try {
+      return await _db
+          .collection("objetivos")
+          .doc(uid)
+          .collection("entradas")
+          .get()
+          .then(_entradasFromFirebase);
+    } catch (error) {
+      print(error);
+      return null;
+    }
+  }
+
+  Future<List<Entrada>> entradas(String fecha) async {
+    try {
+      return await _db
+          .collection("objetivos")
+          .doc(uid)
+          .collection("entradas")
+          .where("fecha", isGreaterThanOrEqualTo: fecha)
+          .get()
+          .then(_entradasFromFirebase);
+    } catch (error) {
+      print(error);
+      return null;
+    }
+  }
+
+  Future deleteEntrada(String fecha) async {
+    try {
+      await _db
+          .collection("objetivos")
+          .doc(uid)
+          .collection("entradas")
+          .doc(fecha)
+          .delete();
     } catch (error) {
       print(error);
     }

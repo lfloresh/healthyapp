@@ -6,6 +6,8 @@ class Objetivos {
   double carDiarias;
   double proDiarias;
   double graDiarias;
+  String date;
+  String menorFecha;
   Objetivos(
       {this.pInicial,
       this.pActual,
@@ -13,5 +15,7 @@ class Objetivos {
       this.calDiarias,
       this.carDiarias,
       this.proDiarias,
-      this.graDiarias});
+      this.graDiarias,
+      this.date,
+      this.menorFecha});
 }

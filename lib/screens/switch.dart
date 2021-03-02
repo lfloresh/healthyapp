@@ -6,7 +6,6 @@ import 'package:healthyapp/screens/home/1home.dart';
 import 'package:healthyapp/screens/home/2registros.dart';
 import 'package:healthyapp/screens/home/3progreso.dart';
 import 'package:healthyapp/screens/home/4objetivos.dart';
-import 'package:healthyapp/screens/home/5graficos.dart';
 import 'package:healthyapp/screens/home/6alimentos.dart';
 import 'package:healthyapp/screens/home/7perfil.dart';
 import 'package:healthyapp/services/database.dart';
@@ -27,8 +26,6 @@ class SwitchPage extends StatelessWidget {
         return ProgresoPage();
       case "Objetivos":
         return ObjetivosPage();
-      case "Gráficos":
-        return GraficosPage();
       case "Alimentos":
         return AlimentosPage(
           db: db,

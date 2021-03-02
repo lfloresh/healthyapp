@@ -79,14 +79,6 @@ Widget listDrawer(BuildContext context) {
             },
           ),
           ListTile(
-            leading: Icon(Icons.insert_chart_outlined),
-            title: Text('Gráficos', style: TextStyle(fontSize: 20)),
-            onTap: () {
-              Navigator.pop(context);
-              page.page = "Gráficos";
-            },
-          ),
-          ListTile(
             leading: Icon(Icons.food_bank_outlined),
             title: Text('Alimentos', style: TextStyle(fontSize: 20)),
             onTap: () {

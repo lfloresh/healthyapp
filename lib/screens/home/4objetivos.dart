@@ -7,6 +7,7 @@ import 'package:healthyapp/models/user.dart';
 import 'package:healthyapp/services/database.dart';
 import 'package:healthyapp/widgets/listDrawer.dart';
 import 'package:healthyapp/widgets/styleText.dart';
+import 'package:intl/intl.dart';
 
 class ObjetivosPage extends StatefulWidget {
   @override
@@ -23,6 +24,9 @@ class _ObjetivosPageState extends State<ObjetivosPage> {
   double carDiarias;
   double proDiarias;
   double graDiarias;
+  String date;
+  String menorFecha;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +38,8 @@ class _ObjetivosPageState extends State<ObjetivosPage> {
     carDiarias = obj.carDiarias;
     proDiarias = obj.proDiarias;
     graDiarias = obj.graDiarias;
+    date = obj.date;
+    menorFecha = obj.menorFecha;
   }
 
   @override
@@ -63,8 +69,27 @@ class _ObjetivosPageState extends State<ObjetivosPage> {
                     "carDiarias": carDiarias == null ? 0 : carDiarias,
                     "proDiarias": proDiarias == null ? 0 : proDiarias,
                     "graDiarias": graDiarias == null ? 0 : graDiarias,
+                    "date": date == null
+                        ? DateFormat("dd-MM-yyyy").format(DateTime.now())
+                        : date,
+                    "menorFecha": menorFecha == null
+                        ? DateFormat("dd-MM-yyyy").format(DateTime.now())
+                        : menorFecha,
                   };
                   await db.setObjectives(objetivos);
+
+                  Map entradaI = {
+                    "peso": pInicial == null ? 0 : pInicial,
+                    "fecha": date == null
+                        ? DateFormat("yyyy-MM-dd").format(DateTime.now())
+                        : date.split('-').reversed.join('-')
+                  };
+                  await db.setEntrada(entradaI);
+                  Map entrada = {
+                    "peso": pActual == null ? 0 : pActual,
+                    "fecha": DateFormat("yyyy-MM-dd").format(DateTime.now()),
+                  };
+                  await db.setEntrada(entrada);
                   page.page = "Home";
                 }
               },
@@ -97,7 +122,7 @@ class _ObjetivosPageState extends State<ObjetivosPage> {
                                 TextStyle(color: Colors.white, fontSize: 20)),
                       ),
                       Container(
-                        height: 70,
+                        height: 60,
                         padding:
                             EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                         child: Row(
@@ -121,6 +146,63 @@ class _ObjetivosPageState extends State<ObjetivosPage> {
                                     val.isEmpty ? "Requerido" : null,
                                 onChanged: (val) => setState(
                                     () => pInicial = double.parse(val)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 60,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Fecha inicio",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18)),
+                            Container(
+                              width: 100,
+                              child: FlatButton(
+                                padding: EdgeInsets.zero,
+                                child: styleText(date, 15),
+                                onPressed: () {
+                                  showDatePicker(
+                                    context: context,
+                                    locale: const Locale("es", "ES"),
+                                    currentDate: DateTime.now(),
+                                    initialDate: DateTime.parse(
+                                        obj.date.split('-').reversed.join()),
+                                    firstDate: DateTime(2010),
+                                    lastDate: DateTime.now(),
+                                    builder: (context, child) {
+                                      return Theme(
+                                        data: ThemeData.dark().copyWith(
+                                          colorScheme: ColorScheme.dark(
+                                            primary: Color(0xff417505),
+                                            onPrimary: Colors.white,
+                                            surface: Color(0xff417505),
+                                            onSurface: Colors.white,
+                                          ),
+                                          dialogBackgroundColor: Colors.green,
+                                        ),
+                                        child: child,
+                                      );
+                                    },
+                                  ).then((dateSelected) {
+                                    if (dateSelected != null)
+                                      setState(() {
+                                        date = DateFormat("dd-MM-yyyy")
+                                            .format(dateSelected);
+                                        if (DateTime.parse(obj.menorFecha
+                                                    .split('-')
+                                                    .reversed
+                                                    .join())
+                                                .compareTo(dateSelected) >
+                                            0) menorFecha = date;
+                                      });
+                                  });
+                                },
                               ),
                             ),
                           ],

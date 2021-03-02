@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 
 class RegisterParameters with ChangeNotifier {
+  String _periodo = "Desde peso inicial";
   String _option = "";
   DateTime _dateTime = DateTime.now();
   double _nraciones = 1.0;
   int _index;
   Map _racion;
 
+  String get periodo => _periodo;
   String get option => _option;
   DateTime get date => _dateTime;
   double get nraciones => _nraciones;
   int get index => _index;
   Map get racion => _racion;
+
+  set periodo(String value) {
+    _periodo = value;
+    notifyListeners();
+  }
 
   set option(String value) {
     _option = value;

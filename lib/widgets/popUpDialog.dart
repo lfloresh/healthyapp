@@ -10,27 +10,35 @@ Widget buildPopUpDialog(BuildContext context) {
       children: <Widget>[
         styleText("Calorías Objetivo", 18),
         SizedBox(height: 10),
-        styleText(
-            "Representa la cantidad de calorías netas diarias que debemos obtener.",
-            15),
+        Flexible(
+          child: styleText(
+              "Representa la cantidad de calorías netas diarias que debemos obtener.",
+              15),
+        ),
         SizedBox(height: 10),
         styleText("Calorías Alimento", 18),
         SizedBox(height: 10),
-        styleText(
-            "Representa la cantidad de calorías que ya hemos obtenido al consumir alimentos.",
-            15),
+        Flexible(
+          child: styleText(
+              "Representa la cantidad de calorías que ya hemos obtenido al consumir alimentos.",
+              15),
+        ),
         SizedBox(height: 10),
         styleText("Calorías Ejercicio", 18),
         SizedBox(height: 10),
-        styleText(
-            "Representa la cantidad de calorías que hemos perdido/quemado al hacer ejercicio.",
-            15),
+        Flexible(
+          child: styleText(
+              "Representa la cantidad de calorías que hemos perdido/quemado al hacer ejercicio.",
+              15),
+        ),
         SizedBox(height: 10),
         styleText("Calorías Restantes", 18),
         SizedBox(height: 10),
-        styleText(
-            "Representa la cantidad de calorías faltantes para completar nuestro objetivo diario.",
-            15),
+        Flexible(
+          child: styleText(
+              "Representa la cantidad de calorías faltantes para completar nuestro objetivo diario.",
+              15),
+        ),
       ],
     ),
     actions: <Widget>[

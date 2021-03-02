@@ -7,6 +7,7 @@ import 'package:healthyapp/screens/Authenticate/authenticate.dart';
 import 'package:healthyapp/screens/switch.dart';
 import 'package:healthyapp/services/database.dart';
 import 'package:healthyapp/services/storage.dart';
+import 'package:intl/intl.dart';
 
 class Wrapper extends StatelessWidget {
   @override
@@ -34,7 +35,9 @@ class Wrapper extends StatelessWidget {
                   pActual: 0.0,
                   pDeseado: 0.0,
                   pInicial: 0.0,
-                  proDiarias: 0.0),
+                  proDiarias: 0.0,
+                  date: DateFormat("dd-MM-yyyy").format(DateTime.now()),
+                  menorFecha: DateFormat("dd-MM-yyyy").format(DateTime.now())),
               catchError: (_, __) => Objetivos(
                   calDiarias: 0.0,
                   carDiarias: 0.0,
@@ -42,7 +45,9 @@ class Wrapper extends StatelessWidget {
                   pActual: 0.0,
                   pDeseado: 0.0,
                   pInicial: 0.0,
-                  proDiarias: 0.0),
+                  proDiarias: 0.0,
+                  date: DateFormat("dd-MM-yyyy").format(DateTime.now()),
+                  menorFecha: DateFormat("dd-MM-yyyy").format(DateTime.now())),
               value: DatabaseService(uid: user.uid).objetivos),
           StreamProvider<UserData>.value(
             value: DatabaseService(uid: user.uid).userData,
