@@ -11,8 +11,8 @@ A new Flutter project.
 -En VScode cree un proyecto flutter: flutter create "nombre".  
 -Acepte las licencias si se piden.  
 -En su proyecto flutter:  
-    -Reemplace la carpeta lib por la del repositorio  
-    -Reemplace el archivo pubspec.yaml  
-    -Agregue la carpeta assets  
+    1-Reemplace la carpeta lib por la del repositorio  
+    2-Reemplace el archivo pubspec.yaml  
+    3-Agregue la carpeta assets  
 -Ejecute con : flutter run en terminal, o start debugging de VScode.  
 -Le pedira un emulador, seleccione el que creó.  
